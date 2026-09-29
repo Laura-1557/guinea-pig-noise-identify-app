@@ -38,41 +38,55 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 
 data class GuineaPigNoise(
+    val id: String,
     val name: String,
     val description: String,
-    val example: String
+    val example: String,
+    val audioResource: Int?
 )
 
 val guineaPigNoises = listOf(
     GuineaPigNoise(
+        id = "wheeking",
         name = "Wheeking",
         description = "A loud, repeated squeaking sound. Guinea pigs often make this noise when they are excited or expecting something enjoyable.",
-        example = "Your guinea pig might wheek when it hears a food bag being opened."
+        example = "Your guinea pig might wheek when it hears a food bag being opened.",
+        audioResource = R.raw.wheeking
     ),
     GuineaPigNoise(
+        id = "purring",
         name = "Purring",
         description = "A low vibrating sound. Depending on the situation, this can indicate relaxation, but some types of purring can also indicate discomfort or irritation.",
-        example = "A relaxed guinea pig may make a soft purring sound while being gently stroked."
+        example = "A relaxed guinea pig may make a soft purring sound while being gently stroked.",
+        audioResource = null
     ),
     GuineaPigNoise(
+        id = "chutting",
         name = "Chutting",
         description = "A series of quiet, short sounds that can occur when a guinea pig is exploring or moving around.",
-        example = "You may hear chutting while your guinea pig explores its enclosure."
+        example = "You may hear chutting while your guinea pig explores its enclosure.",
+        audioResource = null
     ),
     GuineaPigNoise(
+        id = "chirping",
         name = "Chirping",
         description = "A relatively unusual bird-like sound. The reason guinea pigs chirp is not fully understood.",
-        example = "A guinea pig may suddenly produce a quiet, bird-like chirping sound."
+        example = "A guinea pig may suddenly produce a quiet, bird-like chirping sound.",
+        audioResource = null
     ),
     GuineaPigNoise(
+        id = "teeth_chattering",
         name = "Teeth Chattering",
         description = "A rapid clicking or chattering sound made with the teeth. It can be a warning that the guinea pig is annoyed, frightened or becoming aggressive.",
-        example = "Two guinea pigs may chatter their teeth when they are unhappy with each other."
+        example = "Two guinea pigs may chatter their teeth when they are unhappy with each other.",
+        audioResource = null
     ),
     GuineaPigNoise(
+        id = "squeaking",
         name = "Squeaking",
         description = "A short, high-pitched squeak. The meaning can depend heavily on what is happening around the guinea pig.",
-        example = "A guinea pig might squeak when startled or when it wants attention."
+        example = "A guinea pig might squeak when startled or when it wants attention.",
+        audioResource = null
     )
 )
 
@@ -282,51 +296,63 @@ fun InformationScreen(
                 modifier = Modifier.height(8.dp)
             )
 
-            val context = LocalContext.current
-            var mediaPlayer by remember {
-                mutableStateOf<MediaPlayer?>(null)
-            }
+            if (noise.audioResource != null) {
 
-            var isPlaying by remember {
-                mutableStateOf(false)
-            }
+                val context = LocalContext.current
 
-            Button(
-                onClick = {
-
-                    if (isPlaying) {
-
-                        mediaPlayer?.pause()
-                        isPlaying = false
-
-                    } else {
-
-                        if (mediaPlayer == null) {
-                            mediaPlayer = MediaPlayer.create(
-                                context,
-                                R.raw.wheeking
-                            )
-                        }
-
-                        mediaPlayer?.start()
-                        isPlaying = true
-                    }
+                var mediaPlayer by remember {
+                    mutableStateOf<MediaPlayer?>(null)
                 }
-            ) {
+
+                var isPlaying by remember {
+                    mutableStateOf(false)
+                }
+
+                Button(
+                    onClick = {
+
+                        if (isPlaying) {
+
+                            mediaPlayer?.pause()
+                            isPlaying = false
+
+                        } else {
+
+                            if (mediaPlayer == null) {
+
+                                noise.audioResource?.let { resourceId ->
+
+                                    mediaPlayer = MediaPlayer.create(
+                                        context,
+                                        resourceId
+                                    )
+                                }
+                            }
+
+                            mediaPlayer?.start()
+                            isPlaying = true
+                        }
+                    }
+                ) {
+
+                    Text(
+                        if (isPlaying) {
+                            "⏸ Pause ${noise.name.lowercase()}"
+                        } else {
+                            "▶ Play ${noise.name.lowercase()}"
+                        }
+                    )
+                }
+
+            } else {
 
                 Text(
-                    if (isPlaying) {
-                        "⏸ Pause wheeking"
-                    } else {
-                        "▶ Play wheeking"
-                    }
+                    text = "🔊 No recording available yet.",
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
-
-            Text(
-                text = "🔊 No recording available yet.",
-                style = MaterialTheme.typography.bodyLarge
-            )
         }
     }
 }
+
+
