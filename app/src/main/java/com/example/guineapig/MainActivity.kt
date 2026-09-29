@@ -133,7 +133,11 @@ fun GuineaPigApp() {
 
     if (showRecordingScreen) {
 
-        RecordingScreen()
+        RecordingScreen(
+            onBack = {
+                showRecordingScreen = false
+            }
+        )
 
     } else if (selectedNoise == null) {
 

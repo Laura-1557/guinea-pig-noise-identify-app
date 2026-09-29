@@ -23,9 +23,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecordingScreen() {
+fun RecordingScreen(onBack: () -> Unit) {
 
     val context = LocalContext.current
 
@@ -63,138 +70,161 @@ fun RecordingScreen() {
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        modifier = Modifier.fillMaxSize()
     ) {
 
-        Text(
-            text = if (isRecording) {
-                "Recording..."
-            } else {
-                "Record a Noise"
+        TopAppBar(
+            title = {
+                Text("Record a Noise")
+            },
+            navigationIcon = {
+                IconButton(
+                    onClick = {
+                        onBack()
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
             }
         )
 
-        Button(
-            onClick = {
-
-                val permissionAlreadyGranted =
-                    ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.RECORD_AUDIO
-                    ) == PackageManager.PERMISSION_GRANTED
-
-                if (!permissionAlreadyGranted) {
-
-                    permissionLauncher.launch(
-                        Manifest.permission.RECORD_AUDIO
-                    )
-
-                } else if (!isRecording) {
-
-                    val outputFile =
-                        context.getExternalFilesDir(null)
-                            ?.resolve("guinea_pig_recording.m4a")
-
-                    if (outputFile != null) {
-
-                        outputFilePath = outputFile.absolutePath
-
-                        mediaRecorder = MediaRecorder().apply {
-
-                            setAudioSource(
-                                MediaRecorder.AudioSource.MIC
-                            )
-
-                            setOutputFormat(
-                                MediaRecorder.OutputFormat.MPEG_4
-                            )
-
-                            setAudioEncoder(
-                                MediaRecorder.AudioEncoder.AAC
-                            )
-
-                            setOutputFile(
-                                outputFile.absolutePath
-                            )
-
-                            prepare()
-                            start()
-                        }
-
-                        isRecording = true
-                    }
-
-                } else {
-
-                    mediaRecorder?.stop()
-                    mediaRecorder?.release()
-                    mediaRecorder = null
-
-                    isRecording = false
-                }
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
 
             Text(
-                if (isRecording) {
-                    "⏹ Stop"
+                text = if (isRecording) {
+                    "Recording..."
                 } else {
-                    "🎙 Record"
+                    "Record a Noise"
                 }
             )
-        }
-
-        if (outputFilePath != null && !isRecording) {
 
             Button(
                 onClick = {
 
-                    if (isPlaying) {
+                    val permissionAlreadyGranted =
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.RECORD_AUDIO
+                        ) == PackageManager.PERMISSION_GRANTED
 
-                        mediaPlayer?.pause()
-                        isPlaying = false
+                    if (!permissionAlreadyGranted) {
+
+                        permissionLauncher.launch(
+                            Manifest.permission.RECORD_AUDIO
+                        )
+
+                    } else if (!isRecording) {
+
+                        val outputFile =
+                            context.getExternalFilesDir(null)
+                                ?.resolve("guinea_pig_recording.m4a")
+
+                        if (outputFile != null) {
+
+                            outputFilePath = outputFile.absolutePath
+
+                            mediaRecorder = MediaRecorder().apply {
+
+                                setAudioSource(
+                                    MediaRecorder.AudioSource.MIC
+                                )
+
+                                setOutputFormat(
+                                    MediaRecorder.OutputFormat.MPEG_4
+                                )
+
+                                setAudioEncoder(
+                                    MediaRecorder.AudioEncoder.AAC
+                                )
+
+                                setOutputFile(
+                                    outputFile.absolutePath
+                                )
+
+                                prepare()
+                                start()
+                            }
+
+                            isRecording = true
+                        }
 
                     } else {
 
-                        if (mediaPlayer == null) {
+                        mediaRecorder?.stop()
+                        mediaRecorder?.release()
+                        mediaRecorder = null
 
-                            mediaPlayer = MediaPlayer().apply {
-
-                                setDataSource(outputFilePath)
-
-                                prepare()
-
-                                setOnCompletionListener {
-                                    isPlaying = false
-                                    seekTo(0)
-                                }
-                            }
-                        }
-
-                        mediaPlayer?.start()
-                        isPlaying = true
+                        isRecording = false
                     }
-                },
-                modifier = Modifier.padding(top = 16.dp)
+                }
             ) {
 
                 Text(
-                    if (isPlaying) {
-                        "⏸ Pause Recording"
+                    if (isRecording) {
+                        "⏹ Stop"
                     } else {
-                        "▶ Play Recording"
+                        "🎙 Record"
                     }
                 )
             }
 
-            Text(
-                text = "Recording saved.",
-                modifier = Modifier.padding(top = 16.dp)
-            )
+            if (outputFilePath != null && !isRecording) {
+
+                Button(
+                    onClick = {
+
+                        if (isPlaying) {
+
+                            mediaPlayer?.pause()
+                            isPlaying = false
+
+                        } else {
+
+                            if (mediaPlayer == null) {
+
+                                mediaPlayer = MediaPlayer().apply {
+
+                                    setDataSource(outputFilePath)
+
+                                    prepare()
+
+                                    setOnCompletionListener {
+                                        isPlaying = false
+                                        seekTo(0)
+                                    }
+                                }
+                            }
+
+                            mediaPlayer?.start()
+                            isPlaying = true
+                        }
+                    },
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+
+                    Text(
+                        if (isPlaying) {
+                            "⏸ Pause Recording"
+                        } else {
+                            "▶ Play Recording"
+                        }
+                    )
+                }
+
+                Text(
+                    text = "Recording saved.",
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
         }
     }
 }
