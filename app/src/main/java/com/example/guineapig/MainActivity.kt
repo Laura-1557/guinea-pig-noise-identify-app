@@ -32,6 +32,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import android.media.MediaPlayer
+import androidx.compose.material3.Button
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
 
 data class GuineaPigNoise(
     val name: String,
@@ -262,6 +266,65 @@ fun InformationScreen(
 
             Text(
                 text = noise.example,
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Spacer(
+                modifier = Modifier.height(24.dp)
+            )
+
+            Text(
+                text = "Example sound",
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
+            val context = LocalContext.current
+            var mediaPlayer by remember {
+                mutableStateOf<MediaPlayer?>(null)
+            }
+
+            var isPlaying by remember {
+                mutableStateOf(false)
+            }
+
+            Button(
+                onClick = {
+
+                    if (isPlaying) {
+
+                        mediaPlayer?.pause()
+                        isPlaying = false
+
+                    } else {
+
+                        if (mediaPlayer == null) {
+                            mediaPlayer = MediaPlayer.create(
+                                context,
+                                R.raw.wheeking
+                            )
+                        }
+
+                        mediaPlayer?.start()
+                        isPlaying = true
+                    }
+                }
+            ) {
+
+                Text(
+                    if (isPlaying) {
+                        "⏸ Pause wheeking"
+                    } else {
+                        "▶ Play wheeking"
+                    }
+                )
+            }
+
+            Text(
+                text = "🔊 No recording available yet.",
                 style = MaterialTheme.typography.bodyLarge
             )
         }
