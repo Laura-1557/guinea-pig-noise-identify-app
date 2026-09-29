@@ -127,12 +127,23 @@ fun GuineaPigApp() {
         mutableStateOf<GuineaPigNoise?>(null)
     }
 
-    if (selectedNoise == null) {
+    var showRecordingScreen by remember {
+        mutableStateOf(false)
+    }
+
+    if (showRecordingScreen) {
+
+        RecordingScreen()
+
+    } else if (selectedNoise == null) {
 
         HomeScreen(
             noises = guineaPigNoises,
             onNoiseSelected = { noise ->
                 selectedNoise = noise
+            },
+            onRecordSelected = {
+                showRecordingScreen = true
             }
         )
 
@@ -151,7 +162,8 @@ fun GuineaPigApp() {
 @Composable
 fun HomeScreen(
     noises: List<GuineaPigNoise>,
-    onNoiseSelected: (GuineaPigNoise) -> Unit
+    onNoiseSelected: (GuineaPigNoise) -> Unit,
+    onRecordSelected: () -> Unit
 ) {
 
     Scaffold(
@@ -164,22 +176,40 @@ fun HomeScreen(
         }
     ) { paddingValues ->
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(paddingValues)
         ) {
 
-            items(noises) { noise ->
+            Button(
+                onClick = onRecordSelected,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("🎙 Record a Noise")
+            }
 
-                NoiseListItem(
-                    noise = noise,
-                    onClick = {
-                        onNoiseSelected(noise)
-                    }
-                )
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+
+                items(noises) { noise ->
+
+                    NoiseListItem(
+                        noise = noise,
+                        onClick = {
+                            onNoiseSelected(noise)
+                        }
+                    )
+                }
             }
         }
     }
