@@ -42,7 +42,8 @@ data class GuineaPigNoise(
     val name: String,
     val description: String,
     val example: String,
-    val audioResource: Int?
+    val audioResource: Int?,
+    val context: List<String>
 )
 
 val guineaPigNoises = listOf(
@@ -51,42 +52,58 @@ val guineaPigNoises = listOf(
         name = "Wheeking",
         description = "A loud, repeated squeaking sound. Guinea pigs often make this noise when they are excited or expecting something enjoyable.",
         example = "Your guinea pig might wheek when it hears a food bag being opened.",
-        audioResource = R.raw.wheeking
+        audioResource = R.raw.wheeking,
+        context = listOf(
+            "Food may be being prepared or offered.",
+            "Your guinea pig may be expecting something enjoyable.",
+            "A familiar person may be approaching.",
+            "Your guinea pig may be excited or anticipating an event."
+        )
     ),
     GuineaPigNoise(
         id = "purring",
         name = "Purring",
         description = "A low vibrating sound. Depending on the situation, this can indicate relaxation, but some types of purring can also indicate discomfort or irritation.",
         example = "A relaxed guinea pig may make a soft purring sound while being gently stroked.",
-        audioResource = null
+        audioResource = R.raw.purring,
+        context = listOf(
+            "Your guinea pig may be relaxed.",
+            "Your guinea pig may be enjoying gentle interaction.",
+            "The situation may be stimulating or interesting.",
+            "Some types of purring can also occur when a guinea pig is uncomfortable or irritated."
+        )
     ),
     GuineaPigNoise(
         id = "chutting",
         name = "Chutting",
         description = "A series of quiet, short sounds that can occur when a guinea pig is exploring or moving around.",
         example = "You may hear chutting while your guinea pig explores its enclosure.",
-        audioResource = null
+        audioResource = null,
+        context = emptyList()
     ),
     GuineaPigNoise(
         id = "chirping",
         name = "Chirping",
         description = "A relatively unusual bird-like sound. The reason guinea pigs chirp is not fully understood.",
         example = "A guinea pig may suddenly produce a quiet, bird-like chirping sound.",
-        audioResource = null
+        audioResource = null,
+        context = emptyList()
     ),
     GuineaPigNoise(
         id = "teeth_chattering",
         name = "Teeth Chattering",
         description = "A rapid clicking or chattering sound made with the teeth. It can be a warning that the guinea pig is annoyed, frightened or becoming aggressive.",
         example = "Two guinea pigs may chatter their teeth when they are unhappy with each other.",
-        audioResource = null
+        audioResource = null,
+        context = emptyList()
     ),
     GuineaPigNoise(
         id = "squeaking",
         name = "Squeaking",
         description = "A short, high-pitched squeak. The meaning can depend heavily on what is happening around the guinea pig.",
         example = "A guinea pig might squeak when startled or when it wants attention.",
-        audioResource = null
+        audioResource = null,
+        context = emptyList()
     )
 )
 
@@ -350,6 +367,34 @@ fun InformationScreen(
                     text = "🔊 No recording available yet.",
                     style = MaterialTheme.typography.bodyLarge
                 )
+            }
+
+            if (noise.context.isNotEmpty()) {
+
+                Spacer(
+                    modifier = Modifier.height(24.dp)
+                )
+
+                Text(
+                    text = "Context",
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Spacer(
+                    modifier = Modifier.height(8.dp)
+                )
+
+                noise.context.forEach { contextItem ->
+
+                    Text(
+                        text = "• $contextItem",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(6.dp)
+                    )
+                }
             }
         }
     }
